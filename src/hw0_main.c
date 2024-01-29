@@ -73,6 +73,7 @@ void makeMove(int *board, int section){
                         }
                         if(flag == 4){
                             won = true;
+                            return;
                         }
                     }
                     if( section == 4){ // Ruma                
@@ -134,7 +135,7 @@ int main() {
         makeMove(board, section);
         if(hasLost() == true){
             printBoard(board, 5);
-            printf("You lost because you fell into section %d.\n", losingSection + 1);
+            printf("You lost because the last counter fell into section %d.\n", losingSection + 1);
         }
         else if(hasWon() == true){
             printf("You Won!\n");
