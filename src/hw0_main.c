@@ -13,10 +13,7 @@ bool hasWon();
 bool hasLost();
 int promptForMove();
 
-bool hasWon(){ //Needs Revision
-    // if( board[4] == 7 && board[3] == 1){
-    //     printBoard(board,5);
-    //     return true;
+bool hasWon(){ 
     if(won == true){
         return true;
     }
@@ -31,12 +28,12 @@ bool hasLost(){
 }
 
 
-int promptForMove(){
+int promptForMove(int *board){
     int section;
     
     printf("Choose a section (1-4): ");
     scanf("%d" , &section); 
-    while(isValidSectionNum(section) == false){
+    while(isValidSectionNum(section) == false || board[section-1] == 0){
         printf("Invalid choice. Choose a section (1-4): ");
         scanf("%d" , &section);
     }
@@ -45,65 +42,58 @@ int promptForMove(){
 
 
 void makeMove(int *board, int section){
-    int counters;
-    if(board[section] == 0){
-        return;
-    }
-    else{    
-        counters = board[section];
-        board[section] = 0;
-            while(counters > 0){ 
-                if(section == 4){
+    int counters; 
+    counters = board[section];
+    board[section] = 0;
+        while(counters > 0){ 
+            if(section == 4){
                     section = -1;
-                }
-                section++;                   
-                board[section]++;
-                counters--;
-                if( counters == 0){
-                    if(board[section] == 1 && section != 4){ //lost
+            }
+            section++;                   
+            board[section]++;
+            counters--;
+            if( counters == 0){
+                if(board[section] == 1 && section != 4){ //lost
                         lost = true;
                         losingSection = section;
                         return;
+                }
+                int flag = 0;
+                for(int i = 0; i < 4 ; i++){      
+                    if(board[i] == 0){
+                        flag++;               
                     }
-                    int flag = 0;
-                    for( int i = 0; i < 4 ; i++){      
-                        if(board[i] == 0){
-                            flag++;
-                            
-                        }
-                        if(flag == 4){
-                            won = true;
-                            return;
-                        }
-                    }
-                    if( section == 4){ // Ruma                
+                    if(flag == 4){
+                        won = true;
                         return;
                     }
-                    else if(board[section] != 0) { //landed on a section with existing counters
-                        while(board[section] != 0 && section != 4){ // should seperate the ruma logic
-                            if(board[section] == 1 && section != 4){ //lost
-                                lost = true;
-                                losingSection = section;
-                                return;
+                }
+                if( section == 4){ // Ruma                
+                    return;
+                }
+                else if(board[section] != 0) { //landed on a section with existing counters
+                    while(board[section] != 0 && section != 4){ // should seperate the ruma logic
+                        if(board[section] == 1 && section != 4){ //lost
+                            lost = true;
+                            losingSection = section;
+                            return;
+                        }
+                        printBoard(board,5);
+                        printf("Last piece landed in section %d. Continue sowing seeds!\n", section + 1);
+                        counters = board[section];
+                        board[section] = 0;
+                        while(counters > 0){
+                            if(section == 4){
+                                section = -1;
                             }
-                            printBoard(board,5);
-                            printf("Last piece landed in section %d. Continue sowing seeds!\n", section + 1);
-                            counters = board[section];
-                            board[section] = 0;
-                            while(counters > 0){
-                                if(section == 4){
-                                    section = -1;
-                                }
                             section++;
                             board[section]++;
                             counters--;                            
                             }
-                        }
                     }
-
                 }
             }
-    }   
+        }
 }
 
 void printBoard( int *board, int length){
@@ -131,7 +121,7 @@ int main() {
 
     while(hasWon() != true && hasLost() != true){
         printBoard(board,length);
-        section = promptForMove() - 1;     
+        section = promptForMove(board) - 1;     
         makeMove(board, section);
         if(hasLost() == true){
             printBoard(board, 5);
